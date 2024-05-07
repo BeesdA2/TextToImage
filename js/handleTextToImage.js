@@ -1,5 +1,6 @@
 const Jimp = require('jimp') ;
- 
+const fs = require("fs"); //Load the filesystem module
+   
 var file =  process.argv[2];
 var kenteken = process.argv[3];
 var datumtijd = process.argv[4];
@@ -17,10 +18,10 @@ async function startTextToImage(file, kenteken, datumtijd, naw1, naw2, naw3) {
   let newFile = kenteken +'-' + datumtijd + '.jpg'
   const font =  await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
    
-   newImage.print(font, 10, 010, 'Kenteken: ' +kenteken + ' , ' + datumtijd)
-   newImage.print(font, 10, 030, naw1);
-   newImage.print(font, 10, 050, naw2);
-   newImage.print(font, 10, 070, naw3);
+   newImage.print(font, 10, 10, 'Kenteken: ' +kenteken + ' , ' + datumtijd)
+   newImage.print(font, 10, 30, naw1);
+   newImage.print(font, 10, 50, naw2);
+   newImage.print(font, 10, 70, naw3);
   
     
    await newImage.write('../../../../../../Volvo/temp/' +newFile) // save
@@ -30,27 +31,36 @@ async function startTextToImage(file, kenteken, datumtijd, naw1, naw2, naw3) {
    // Reading image
    console.log('file: ' +file);
    const fir_img = await Jimp.read('../../../../../../Volvo/temp/' + file);
-   //const fir_img = await Jimp.read('../../../../../../Volvo/temp/Elin duinen.jpg');
-   var w = fir_img.bitmap.width; //  width of the image
-    var h = fir_img.bitmap.height; // height of the image
-   
-    if (w >= 3000 && h >= 2000)
-     {
-      fir_img.scale( 0.25 );
-     }
-   
-   
-   
-        const sec_img = await Jimp.read('../../../../../../Volvo/temp/' + newFile );
+ 
+ // Writing image after processing
+     await fir_img.writeAsync('../../../../../../Volvo/temp/save_' + file);
+  
+	    const sec_img = await Jimp.read('../../../../../../Volvo/temp/' + newFile );
                     
         fir_img.blit(sec_img, 0, 0);
-					//fir_img.write('../../../../../../Volvo/temp/' + file);
-			 
-			
- 
-   // Writing image after processing
+	
+	//fir_img.write('../../../../../../Volvo/temp/' + file);
+  	  
+    // Writing image after processing
      await fir_img.writeAsync('../../../../../../Volvo/temp/' + file);
    
+     const stats = fs.statSync('../../../../../../Volvo/temp/' + file);
+
+	const fileSizeInBytes = stats.size;
+	console.log('Size in bytes:', fileSizeInBytes);
+
+	let fileSizeInMegaBytes = fileSizeInBytes / (1024 * 1024);
+	console.log('Size in MegaBytes:', fileSizeInMegaBytes);
+   
+	if(fileSizeInMegaBytes > 5) {
+		const txt_img = await Jimp.read('../../../../../../Volvo/temp/' + file);
+		console.log("before scale");
+		let scale = parseFloat(5/fileSizeInMegaBytes).toFixed(2)
+		console.log("scale is: " + scale);
+		txt_img.scale( Number(scale)  );
+		// Writing image after processing
+     await txt_img.writeAsync('../../../../../../Volvo/temp/' + file);
+	}
  
  } catch (e) {
         console.log('startTextToImage error: '+e);
@@ -87,7 +97,6 @@ async function handleTextToImageNow(file, kenteken, datumtijd, naw1, naw2, naw3)
 
 async function handleResizeImage(file, maxsize) {
  try{
-   const fs = require("fs"); //Load the filesystem module
    const stats = fs.statSync('../../../../../../Volvo/temp/' + file);
    const fileSizeInBytes = stats.size;	
    var fileSizeInKB = fileSizeInBytes / Math.pow(1024,1)
