@@ -31,13 +31,9 @@ async function startTextToImage(file, kenteken, datumtijd, naw1, naw2, naw3) {
    // Reading image
    console.log('file: ' +file);
    const fir_img = await Jimp.read('../../../../../../Volvo/temp/' + file);
- 
- // Writing image after processing
-     await fir_img.writeAsync('../../../../../../Volvo/temp/save_' + file);
-  
-	    const sec_img = await Jimp.read('../../../../../../Volvo/temp/' + newFile );
+   const sec_img = await Jimp.read('../../../../../../Volvo/temp/' + newFile );
                     
-        fir_img.blit(sec_img, 0, 0);
+    fir_img.composite(sec_img, 0, 0);
 	
 	//fir_img.write('../../../../../../Volvo/temp/' + file);
   	  
