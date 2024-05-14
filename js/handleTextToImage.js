@@ -34,8 +34,10 @@ async function startTextToImage(file, kenteken, datumtijd, naw1, naw2, naw3) {
    const sec_img = await Jimp.read('../../../../../../Volvo/temp/' + newFile );
                     
     fir_img.composite(sec_img, 0, 0);
-	
-	//fir_img.write('../../../../../../Volvo/temp/' + file);
+    // extensie vervangen
+    file = file.replace(/.png/i, '.jpg');
+    console.log('file without png: ' +file);
+    //fir_img.write('../../../../../../Volvo/temp/' + file);
   	  
     // Writing image after processing
      await fir_img.writeAsync('../../../../../../Volvo/temp/' + file);
